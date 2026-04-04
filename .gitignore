@@ -1,6 +1,8 @@
-echo "server/venv/
+server/venv/
 server/.env
 client/node_modules/
 client/dist/
 .env
-" > .gitignore
+__pycache__/
+*.pyc
+.DS_Store
