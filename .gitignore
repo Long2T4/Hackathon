@@ -1,0 +1,6 @@
+echo "server/venv/
+server/.env
+client/node_modules/
+client/dist/
+.env
+" > .gitignore
