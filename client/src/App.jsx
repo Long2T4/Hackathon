@@ -1,54 +1,62 @@
 import { useState } from 'react'
 import Header from './components/Header.jsx'
+import HomeScreen from './components/HomeScreen.jsx'
 import Chat from './components/Chat.jsx'
 import InsuranceGuide from './components/InsuranceGuide.jsx'
-import { MessageCircle, Heart } from 'lucide-react'
+import ClinicFinder from './components/ClinicFinder.jsx'
+import { Home, MessageCircle, Heart, MapPin } from 'lucide-react'
 
 export default function App() {
   const [lang, setLang] = useState('es')
-  const [activeTab, setActiveTab] = useState('chat')
+  const [activeTab, setActiveTab] = useState('home')
 
   const t = (es, en) => lang === 'es' ? es : en
 
-  return (
-    <div className="min-h-screen flex flex-col bg-slate-50 max-w-lg mx-auto relative">
-      <Header lang={lang} setLang={setLang} />
+  const tabs = [
+    { id: 'home', icon: Home, label: t('Inicio', 'Home') },
+    { id: 'chat', icon: MessageCircle, label: t('Chat', 'Chat') },
+    { id: 'clinics', icon: MapPin, label: t('Clínicas', 'Clinics') },
+    { id: 'insurance', icon: Heart, label: t('Opciones', 'Options') },
+  ]
 
-      <main className="flex-1 flex flex-col pb-20 overflow-hidden">
+  return (
+    <div className="min-h-screen flex flex-col bg-[#F5F5FA] max-w-lg mx-auto relative">
+      {activeTab !== 'home' && <Header lang={lang} setLang={setLang} onBack={() => setActiveTab('home')} />}
+
+      <main className="flex-1 flex flex-col pb-24 overflow-hidden">
+        {activeTab === 'home' && <HomeScreen lang={lang} setLang={setLang} onNavigate={setActiveTab} />}
         {activeTab === 'chat' && <Chat lang={lang} />}
+        {activeTab === 'clinics' && (
+          <div className="flex-1 overflow-y-auto px-4 py-5">
+            <h2 className="font-display text-xl font-semibold text-gray-900 mb-4">
+              {t('Clínicas Cercanas', 'Nearby Clinics')}
+            </h2>
+            <ClinicFinder lang={lang} />
+          </div>
+        )}
         {activeTab === 'insurance' && <InsuranceGuide lang={lang} />}
       </main>
 
-      {/* Bottom tab bar */}
-      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-white border-t border-gray-100 shadow-2xl z-40">
-        <div className="grid grid-cols-2 h-16">
-          <button
-            onClick={() => setActiveTab('chat')}
-            className={`flex flex-col items-center justify-center gap-1 text-xs font-semibold transition-colors ${
-              activeTab === 'chat' ? 'text-teal-600' : 'text-gray-400'
-            }`}
-            aria-label={t('Síntomas / Chat', 'Symptoms / Chat')}
-          >
-            <MessageCircle size={22} strokeWidth={activeTab === 'chat' ? 2.5 : 1.8} />
-            <span>{t('Síntomas', 'Symptoms')}</span>
-            {activeTab === 'chat' && (
-              <span className="absolute bottom-0 w-8 h-0.5 bg-teal-600 rounded-t-full" />
-            )}
-          </button>
-
-          <button
-            onClick={() => setActiveTab('insurance')}
-            className={`flex flex-col items-center justify-center gap-1 text-xs font-semibold transition-colors relative ${
-              activeTab === 'insurance' ? 'text-teal-600' : 'text-gray-400'
-            }`}
-            aria-label={t('Opciones de Seguro', 'Insurance Options')}
-          >
-            <Heart size={22} strokeWidth={activeTab === 'insurance' ? 2.5 : 1.8} />
-            <span>{t('Opciones', 'Options')}</span>
-            {activeTab === 'insurance' && (
-              <span className="absolute bottom-0 w-8 h-0.5 bg-teal-600 rounded-t-full" />
-            )}
-          </button>
+      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg z-40">
+        <div className="mx-3 mb-4 bg-white/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-black/10 border border-gray-100">
+          <div className="grid grid-cols-4 h-16 px-2">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex flex-col items-center justify-center gap-1 text-[10px] font-semibold transition-all duration-200 ${
+                  activeTab === tab.id ? 'text-violet-600' : 'text-gray-400'
+                }`}
+              >
+                <div className={`p-1.5 rounded-xl transition-all duration-200 ${
+                  activeTab === tab.id ? 'bg-violet-100' : ''
+                }`}>
+                  <tab.icon size={18} strokeWidth={activeTab === tab.id ? 2.5 : 1.8} />
+                </div>
+                <span>{tab.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </nav>
     </div>
