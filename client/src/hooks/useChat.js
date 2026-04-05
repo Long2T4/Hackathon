@@ -7,8 +7,8 @@ export function useChat(lang) {
       id: 'welcome',
       role: 'assistant',
       content: lang === 'es'
-        ? '¡Hola! Soy tu asistente de salud MiSalud. 🌿\n\nPuedes describirme tus síntomas en español o inglés, y te ayudaré a entender qué podría estar pasando y qué hacer a continuación.\n\n*Recuerda: No soy un médico. Mi objetivo es orientarte, no diagnosticarte.*'
-        : 'Hello! I\'m your MiSalud health assistant. 🌿\n\nYou can describe your symptoms in Spanish or English, and I\'ll help you understand what might be happening and what to do next.\n\n*Remember: I\'m not a doctor. My goal is to guide you, not diagnose you.*',
+        ? '¡Hola! Soy tu asistente de salud MiSalud. 🌿\n\nPuedes describirme tus síntomas en español o inglés, y te ayudaré a entender qué podría estar pasando y qué hacer a continuación.\n\nTambién puedes adjuntar una foto de una receta o documento médico y te lo explico en español simple.\n\n*Recuerda: No soy un médico. Mi objetivo es orientarte, no diagnosticarte.*'
+        : 'Hello! I\'m your MiSalud health assistant. 🌿\n\nYou can describe your symptoms in Spanish or English, and I\'ll help you understand what might be happening and what to do next.\n\nYou can also attach a photo of a prescription or medical document and I\'ll explain it in simple terms.\n\n*Remember: I\'m not a doctor. My goal is to guide you, not diagnose you.*',
       urgency: null,
       timestamp: new Date(),
     }
@@ -17,14 +17,17 @@ export function useChat(lang) {
   const [error, setError] = useState(null)
   const [triageResult, setTriageResult] = useState(null)
 
-  const sendUserMessage = useCallback(async (text) => {
-    if (!text.trim() || isLoading) return
+  const sendUserMessage = useCallback(async (text, fileData = null) => {
+    if (!text.trim() && !fileData) return
+    if (isLoading) return
 
     const userMsg = {
       id: Date.now().toString(),
       role: 'user',
-      content: text.trim(),
+      content: text.trim() || (fileData ? `📎 ${fileData.fileName}` : ''),
       timestamp: new Date(),
+      hasFile: Boolean(fileData),
+      fileName: fileData?.fileName,
     }
 
     setMessages(prev => [...prev, userMsg])
@@ -32,13 +35,12 @@ export function useChat(lang) {
     setError(null)
 
     try {
-      // Build history for API (last 20 messages, excluding welcome)
       const history = messages
         .filter(m => m.id !== 'welcome')
         .slice(-19)
         .map(m => ({ role: m.role, content: m.content }))
 
-      const response = await sendMessage(text.trim(), history, lang)
+      const response = await sendMessage(text.trim(), history, lang, fileData)
 
       const assistantMsg = {
         id: (Date.now() + 1).toString(),
@@ -51,11 +53,12 @@ export function useChat(lang) {
 
       setMessages(prev => [...prev, assistantMsg])
 
-      if (response.urgency) {
+      // Show triage actions for ANY health-related response
+      if (response.urgency || (response.questions && response.questions.length > 0)) {
         setTriageResult({
-          urgency: response.urgency,
+          urgency: response.urgency || 'selfcare',
           content: response.content,
-          questions: response.questions,
+          questions: response.questions || [],
           userSymptoms: text.trim(),
         })
       }
@@ -75,8 +78,8 @@ export function useChat(lang) {
       id: 'welcome',
       role: 'assistant',
       content: lang === 'es'
-        ? '¡Hola! Soy tu asistente de salud MiSalud. 🌿\n\nPuedes describirme tus síntomas en español o inglés, y te ayudaré a entender qué podría estar pasando y qué hacer a continuación.\n\n*Recuerda: No soy un médico. Mi objetivo es orientarte, no diagnosticarte.*'
-        : 'Hello! I\'m your MiSalud health assistant. 🌿\n\nYou can describe your symptoms in Spanish or English, and I\'ll help you understand what might be happening and what to do next.\n\n*Remember: I\'m not a doctor. My goal is to guide you, not diagnose you.*',
+        ? '¡Hola! Soy tu asistente de salud MiSalud. 🌿\n\nPuedes describirme tus síntomas en español o inglés, y te ayudaré a entender qué podría estar pasando y qué hacer a continuación.\n\nTambién puedes adjuntar una foto de una receta o documento médico y te lo explico en español simple.\n\n*Recuerda: No soy un médico. Mi objetivo es orientarte, no diagnosticarte.*'
+        : 'Hello! I\'m your MiSalud health assistant. 🌿\n\nYou can describe your symptoms in Spanish or English, and I\'ll help you understand what might be happening and what to do next.\n\nYou can also attach a photo of a prescription or medical document and I\'ll explain it in simple terms.\n\n*Remember: I\'m not a doctor. My goal is to guide you, not diagnose you.*',
       urgency: null,
       timestamp: new Date(),
     }])

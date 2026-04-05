@@ -1,10 +1,20 @@
 const BASE_URL = '/api'
 
-export async function sendMessage(message, history, lang) {
+export async function sendMessage(message, history, lang, fileData = null) {
+  const body = { message, history, lang }
+
+  if (fileData) {
+    body.file = {
+      base64: fileData.base64,
+      mediaType: fileData.mediaType,
+      fileName: fileData.fileName,
+    }
+  }
+
   const response = await fetch(`${BASE_URL}/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, history, lang }),
+    body: JSON.stringify(body),
   })
 
   if (!response.ok) {

@@ -112,8 +112,11 @@ function InsuranceCard({ option, lang }) {
     red: 'border-red-200 bg-red-50',
   }
   const iconBg = {
-    teal: 'bg-teal-100', blue: 'bg-blue-100', purple: 'bg-purple-100',
-    green: 'bg-green-100', red: 'bg-red-100',
+    teal: 'bg-teal-100',
+    blue: 'bg-blue-100',
+    purple: 'bg-purple-100',
+    green: 'bg-green-100',
+    red: 'bg-red-100',
   }
 
   return (
@@ -156,10 +159,12 @@ export default function InsuranceGuide({ lang }) {
   const [recommendations, setRecommendations] = useState([])
   const t = (es, en) => lang === 'es' ? es : en
 
+  const answeredCount = Object.keys(quizAnswers).length
+  const currentQ = QUIZ_QUESTIONS[answeredCount]
+
   const handleAnswer = (questionId, value) => {
     const newAnswers = { ...quizAnswers, [questionId]: value }
     setQuizAnswers(newAnswers)
-
     if (Object.keys(newAnswers).length === QUIZ_QUESTIONS.length) {
       setRecommendations(getRecommendation(newAnswers))
       setQuizDone(true)
@@ -171,9 +176,6 @@ export default function InsuranceGuide({ lang }) {
     setQuizDone(false)
     setRecommendations([])
   }
-
-  const currentQ = QUIZ_QUESTIONS[Object.keys(quizAnswers).length]
-  const answeredCount = Object.keys(quizAnswers).length
 
   return (
     <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
@@ -192,13 +194,29 @@ export default function InsuranceGuide({ lang }) {
           <h3 className="font-semibold text-gray-900 text-sm">
             {t('¿Cuál opción me conviene?', 'Which option is right for me?')}
           </h3>
-          {answeredCount > 0 && !quizDone && (
-            <span className="text-xs text-gray-400">{answeredCount}/{QUIZ_QUESTIONS.length}</span>
-          )}
         </div>
 
         {!quizDone && currentQ && (
           <div className="animate-fade-in">
+            {/* Progress bar */}
+            <div className="mb-4">
+              <div className="flex justify-between text-[10px] text-gray-400 mb-1">
+                <span>
+                  {t(
+                    `Pregunta ${answeredCount + 1} de ${QUIZ_QUESTIONS.length}`,
+                    `Question ${answeredCount + 1} of ${QUIZ_QUESTIONS.length}`
+                  )}
+                </span>
+                <span>{Math.round((answeredCount / QUIZ_QUESTIONS.length) * 100)}%</span>
+              </div>
+              <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-violet-500 rounded-full transition-all duration-500"
+                  style={{ width: `${(answeredCount / QUIZ_QUESTIONS.length) * 100}%` }}
+                />
+              </div>
+            </div>
+
             <p className="text-sm font-medium text-gray-800 mb-3">
               {lang === 'es' ? currentQ.questionES : currentQ.questionEN}
             </p>
@@ -207,7 +225,7 @@ export default function InsuranceGuide({ lang }) {
                 <button
                   key={opt.value}
                   onClick={() => handleAnswer(currentQ.id, opt.value)}
-                  className="w-full text-left px-4 py-3 rounded-xl border-2 border-gray-100 bg-gray-50 text-sm font-medium text-gray-700 hover:border-teal-300 hover:bg-teal-50 transition-all min-h-[48px]"
+                  className="w-full text-left px-4 py-3 rounded-xl border-2 border-gray-100 bg-gray-50 text-sm font-medium text-gray-700 hover:border-violet-300 hover:bg-violet-50 transition-all min-h-[48px]"
                 >
                   {lang === 'es' ? opt.labelES : opt.labelEN}
                 </button>
@@ -218,6 +236,17 @@ export default function InsuranceGuide({ lang }) {
 
         {quizDone && (
           <div className="animate-fade-in">
+            {/* Completed progress bar */}
+            <div className="mb-4">
+              <div className="flex justify-between text-[10px] text-gray-400 mb-1">
+                <span>{t('Completado', 'Completed')}</span>
+                <span>100%</span>
+              </div>
+              <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-full bg-violet-500 rounded-full w-full" />
+              </div>
+            </div>
+
             <div className="flex items-center gap-2 mb-3 text-teal-700">
               <CheckCircle size={18} />
               <p className="text-sm font-semibold">
@@ -235,7 +264,7 @@ export default function InsuranceGuide({ lang }) {
                 )
               })}
             </div>
-            <button onClick={resetQuiz} className="text-xs text-teal-600 font-medium underline">
+            <button onClick={resetQuiz} className="text-xs text-violet-600 font-medium underline">
               {t('Volver a tomar el cuestionario', 'Retake the quiz')}
             </button>
           </div>
