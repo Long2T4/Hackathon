@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, current_app
-from services.places_service import fetch_clinics
+from services.places_service import fetch_clinics, fetch_place_phone
 
 clinics_bp = Blueprint('clinics', __name__)
 
@@ -24,3 +24,16 @@ def clinics():
     except Exception as e:
         current_app.logger.error(f'Clinics error: {e}')
         return jsonify({'error': 'Could not fetch clinic data'}), 500
+
+
+@clinics_bp.route('/clinic-phone', methods=['GET'])
+def clinic_phone():
+    place_id = request.args.get('place_id', '').strip()
+    if not place_id:
+        return jsonify({'error': 'place_id required'}), 400
+    try:
+        phone = fetch_place_phone(place_id)
+        return jsonify({'phone': phone})
+    except Exception as e:
+        current_app.logger.error(f'Phone lookup error: {e}')
+        return jsonify({'phone': None})
