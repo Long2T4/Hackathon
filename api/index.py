@@ -1,10 +1,20 @@
 import sys
 import os
 
-# Make the server directory importable
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'server'))
+# Ensure the api directory itself is on the path so routes/services import correctly
+sys.path.insert(0, os.path.dirname(__file__))
 
-from app import app
+from flask import Flask
+from flask_cors import CORS
+from routes.chat import chat_bp
+from routes.clinics import clinics_bp
 
-# Vercel needs the app object exposed as `app`
-# (it does NOT call __main__, so the if __name__ == '__main__' block is skipped)
+app = Flask(__name__)
+CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+app.register_blueprint(chat_bp, url_prefix='/api')
+app.register_blueprint(clinics_bp, url_prefix='/api')
+
+@app.route('/api/health')
+def health():
+    return {'status': 'ok', 'service': 'MiSalud API'}
