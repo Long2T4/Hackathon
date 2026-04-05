@@ -3,9 +3,9 @@ import { Bell } from 'lucide-react'
 const QUICK_ACTIONS = [
   {
     id: 'chat',
-    emoji: '🩺',
-    labelES: 'Síntomas',
-    labelEN: 'Symptoms',
+    emoji: '🤖',
+    labelES: 'Chat Bot',
+    labelEN: 'Chat Bot',
     bg: 'bg-violet-50',
     text: 'text-violet-600',
   },
@@ -18,21 +18,21 @@ const QUICK_ACTIONS = [
     text: 'text-teal-600',
   },
   {
-    id: 'insurance',
-    emoji: '📋',
-    labelES: 'Seguros',
-    labelEN: 'Insurance',
-    bg: 'bg-orange-50',
-    text: 'text-orange-600',
+    id: 'translator',
+    emoji: '🌊',
+    labelES: 'Traductor',
+    labelEN: 'Translator',
+    bg: 'bg-blue-50',
+    text: 'text-blue-600',
   },
   {
-    id: 'chat',
-    emoji: '📄',
-    labelES: 'Tarjeta',
-    labelEN: 'Visit Card',
+    id: 'reminders',
+    emoji: '🗓️',
+    labelES: 'Recordatorios',
+    labelEN: 'Reminders',
     bg: 'bg-pink-50',
     text: 'text-pink-600',
-  },
+   },
 ]
 
 const RECENT_TOPICS = [
@@ -61,7 +61,6 @@ export default function HomeScreen({ lang, setLang, onNavigate }) {
 
   return (
     <div className="flex-1 overflow-y-auto">
-      {/* Header */}
       <div className="px-5 pt-12 pb-4 flex items-start justify-between">
         <div>
           <p className="text-sm text-gray-500 font-medium">{greeting} 👋</p>
@@ -92,7 +91,6 @@ export default function HomeScreen({ lang, setLang, onNavigate }) {
             minHeight: 180,
           }}
         >
-          {/* Orb */}
           <div className="absolute right-4 top-1/2 -translate-y-1/2">
             <div
               className="w-28 h-28 rounded-full"
@@ -107,10 +105,8 @@ export default function HomeScreen({ lang, setLang, onNavigate }) {
               </div>
             </div>
           </div>
-
-          {/* Text */}
           <div className="px-6 py-6 pr-36 text-left">
-            <p className="text-white/80 text-xs font-semibold uppercase tracking-widest mb-2">MiSalud AI</p>
+            <p className="text-white/80 text-xs font-semibold uppercase tracking-widest mb-2">MiSalud AI 🤖</p>
             <h2 className="text-white font-display font-semibold text-xl leading-tight mb-3">
               {t('Tu asistente de salud bilingüe', 'Your bilingual health assistant')}
             </h2>
@@ -152,7 +148,6 @@ export default function HomeScreen({ lang, setLang, onNavigate }) {
             {t('Ver todas', 'View all')}
           </button>
         </div>
-
         <div className="space-y-2">
           {RECENT_TOPICS.map((item, i) => {
             const badge = URGENCY_BADGE[item.urgency]
