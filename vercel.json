@@ -2,25 +2,19 @@
   "version": 2,
   "builds": [
     {
-      "src": "server/app.py",
+      "src": "api/index.py",
       "use": "@vercel/python"
     },
     {
       "src": "client/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "client/dist"
+        "distDir": "dist"
       }
     }
   ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "server/app.py"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "client/dist/$1"
-    }
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

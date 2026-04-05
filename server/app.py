@@ -1,11 +1,9 @@
 from flask import Flask
 from flask_cors import CORS
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 import os
 import sys
 
-# Fix imports for Vercel
+# Fix imports for Vercel serverless
 sys.path.insert(0, os.path.dirname(__file__))
 
 from routes.chat import chat_bp
@@ -14,14 +12,6 @@ from routes.clinics import clinics_bp
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-limiter = Limiter(
-    app=app,
-    key_func=get_remote_address,
-    default_limits=["30 per minute"],
-    storage_uri="memory://",
-)
-
-app.config['LIMITER'] = limiter
 app.register_blueprint(chat_bp, url_prefix='/api')
 app.register_blueprint(clinics_bp, url_prefix='/api')
 
