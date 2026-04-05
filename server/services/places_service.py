@@ -69,7 +69,14 @@ def fetch_clinics(lat: float, lng: float, radius: int = 8000) -> list:
             continue
 
     results.sort(key=lambda x: x['distance'])
-    return results[:10]
+    top = results[:10]
+
+    # Fetch phone numbers for top 5 results in parallel-ish
+    for clinic in top[:5]:
+        if not clinic['place_id'].startswith('mock_'):
+            clinic['phone'] = fetch_place_phone(clinic['place_id'])
+
+    return top
 
 
 def fetch_place_phone(place_id: str) -> str | None:

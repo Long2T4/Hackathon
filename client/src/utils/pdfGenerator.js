@@ -36,50 +36,76 @@ export function generateVisitCardPDF(data) {
   let y = 44
 
   if (data.patientName || data.patientDOB) {
+    // Calculate dynamic height based on content
+    const hasAllergies = Boolean(data.allergies)
+    const hasMedsInBox = false // medications get their own box below
+    const hasInsurance = Boolean(data.insuranceProvider)
+    const hasInsuranceId = Boolean(data.insuranceId)
+
+    // Rows: name, dob+insurance row, allergies row
+    let boxRows = 1 // name row always
+    boxRows += 1    // dob row always (even if empty shows label)
+    if (hasAllergies) boxRows += 1
+    const rowH = 8
+    const boxH = rowH * boxRows + 8
+    const labelX = margin + 3
+    const valueX = margin + 42
+    const midX = pageW / 2 + 3
+    const midValueX = pageW / 2 + 40
+
     doc.setFillColor(248, 250, 252)
-    doc.roundedRect(margin, y, pageW - margin * 2, 22, 2, 2, 'F')
+    doc.roundedRect(margin, y, pageW - margin * 2, boxH, 2, 2, 'F')
     doc.setDrawColor(220, 220, 220)
     doc.setLineWidth(0.3)
-    doc.roundedRect(margin, y, pageW - margin * 2, 22, 2, 2, 'S')
+    doc.roundedRect(margin, y, pageW - margin * 2, boxH, 2, 2, 'S')
 
-    doc.setTextColor(75, 85, 99)
-    doc.setFont('helvetica', 'bold')
     doc.setFontSize(8)
-    doc.text('Paciente / Patient:', margin + 3, y + 7)
 
+    // Row 1 — Name (left) | Insurance (right)
+    let row1Y = y + 7
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(75, 85, 99)
+    doc.text('Paciente / Patient:', labelX, row1Y)
     doc.setFont('helvetica', 'normal')
-    doc.text(data.patientName || '—', margin + 38, y + 7)
+    const nameStr = (data.patientName || '—').slice(0, 35)
+    doc.text(nameStr, valueX, row1Y)
 
-    if (data.patientDOB) {
+    if (hasInsurance) {
       doc.setFont('helvetica', 'bold')
-      doc.text('DOB:', margin + 3, y + 14)
+      doc.text('Insurance:', midX, row1Y)
       doc.setFont('helvetica', 'normal')
-      doc.text(data.patientDOB, margin + 14, y + 14)
+      const insStr = (data.insuranceProvider || '—').slice(0, 25)
+      doc.text(insStr, midValueX, row1Y)
     }
 
-    if (data.insuranceProvider && data.insuranceProvider !== 'Sin seguro / Uninsured') {
+    // Row 2 — DOB (left) | Insurance ID (right)
+    let row2Y = row1Y + rowH
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(75, 85, 99)
+    doc.text('DOB:', labelX, row2Y)
+    doc.setFont('helvetica', 'normal')
+    doc.text(data.patientDOB || '—', valueX, row2Y)
+
+    if (hasInsuranceId) {
       doc.setFont('helvetica', 'bold')
-      doc.text('Seguro / Insurance:', pageW / 2 + 3, y + 7)
+      doc.text('ID:', midX, row2Y)
       doc.setFont('helvetica', 'normal')
-      doc.text(data.insuranceProvider, pageW / 2 + 38, y + 7)
-      if (data.insuranceId) {
-        doc.setFont('helvetica', 'bold')
-        doc.text('ID:', pageW / 2 + 3, y + 14)
-        doc.setFont('helvetica', 'normal')
-        doc.text(data.insuranceId, pageW / 2 + 10, y + 14)
-      }
+      doc.text(data.insuranceId.slice(0, 25), midValueX, row2Y)
     }
 
-    if (data.allergies) {
+    // Row 3 — Allergies (full width, red)
+    if (hasAllergies) {
+      let row3Y = row2Y + rowH
       doc.setFont('helvetica', 'bold')
       doc.setTextColor(185, 28, 28)
-      doc.text('ALERGIAS / ALLERGIES:', margin + 3, y + 14)
+      doc.text('Allergies / Alergias:', labelX, row3Y)
       doc.setFont('helvetica', 'normal')
-      doc.text(data.allergies, margin + 43, y + 14)
+      const allergyStr = data.allergies.slice(0, 60)
+      doc.text(allergyStr, valueX, row3Y)
       doc.setTextColor(75, 85, 99)
     }
 
-    y += 28
+    y += boxH + 5
   }
 
   // ── Medications ───────────────────────────────────────────────────────────

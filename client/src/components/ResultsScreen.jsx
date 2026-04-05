@@ -1,24 +1,13 @@
 import { useState, useEffect } from 'react'
-import { ArrowLeft, MapPin, Phone, Globe, Star, Navigation, Loader2, MessageCircle, RotateCcw } from 'lucide-react'
+import { ArrowLeft, MapPin, Phone, Globe, Star, Navigation, MessageCircle, RotateCcw, Loader2 } from 'lucide-react'
 import VisitCard from './VisitCard.jsx'
 
 function ClinicItem({ clinic, index, lang, urgency }) {
   const t = (es, en) => lang === 'es' ? es : en
-  const [phone, setPhone] = useState(null)
-  const [loadingPhone, setLoadingPhone] = useState(false)
+  const phone = clinic.phone || null
   const stars = Math.round(clinic.rating || 0)
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(clinic.address)}`
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(clinic.name)}`
-
-  useEffect(() => {
-    if (!clinic.place_id || clinic.place_id.startsWith('mock_')) return
-    setLoadingPhone(true)
-    fetch(`/api/clinic-phone?place_id=${clinic.place_id}`)
-      .then(r => r.json())
-      .then(d => { if (d.phone) setPhone(d.phone) })
-      .catch(() => {})
-      .finally(() => setLoadingPhone(false))
-  }, [clinic.place_id])
 
   const costHint = urgency === 'emergency'
     ? { es: 'Ir a urgencias inmediatamente', en: 'Go to ER immediately', color: 'text-red-600 bg-red-50' }
@@ -62,8 +51,8 @@ function ClinicItem({ clinic, index, lang, urgency }) {
               onClick={!phone ? (e) => e.preventDefault() : undefined}
               className={`flex-1 flex items-center justify-center gap-1 rounded-xl py-2 text-xs font-bold text-white ${phone ? 'bg-violet-600' : 'bg-gray-300'}`}
             >
-              {loadingPhone ? <Loader2 size={11} className="animate-spin" /> : <Phone size={11} />}
-              {phone ? t('Llamar', 'Call') : loadingPhone ? '...' : t('Sin numero', 'No number')}
+              <Phone size={11} />
+              {phone || t('Sin numero', 'No number')}
             </a>
           </div>
         </div>
