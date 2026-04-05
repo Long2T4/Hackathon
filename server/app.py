@@ -2,11 +2,14 @@ from flask import Flask
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+import os
+import sys
+
+# Fix imports for Vercel
+sys.path.insert(0, os.path.dirname(__file__))
+
 from routes.chat import chat_bp
 from routes.clinics import clinics_bp
-import os
-from dotenv import load_dotenv
-load_dotenv()
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
