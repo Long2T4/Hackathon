@@ -54,7 +54,7 @@ export default function WelcomeScreen({ lang, setLang, onStart, onTab }) {
         <button onClick={onStart} className="w-full bg-white rounded-2xl shadow-xl shadow-violet-100 p-5 flex items-center justify-between border border-violet-50">
           <div className="text-left">
             <p className="font-bold text-gray-900 text-lg">{t('Comenzar Análisis', 'Start Analysis')}</p>
-            <p className="text-gray-400 text-sm mt-0.5">{t('4 pasos · ~3 minutos', '4 steps · ~3 minutes')}</p>
+            <p className="text-gray-400 text-sm mt-0.5">{t('3 pasos · ~3 minutos', '3 steps · ~3 minutes')}</p>
           </div>
           <div className="w-12 h-12 bg-violet-600 rounded-2xl flex items-center justify-center shadow-lg shadow-violet-300">
             <ArrowRight size={20} className="text-white" />

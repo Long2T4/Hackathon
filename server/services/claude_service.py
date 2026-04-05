@@ -137,23 +137,30 @@ Rules:
 
 
 def generate_visit_card_data(chat_summary: dict, lang: str = 'es') -> dict:
-    prompt = f"""Generate a bilingual visit card in JSON format.
+    prompt = f"""You are a bilingual medical translator. Generate a visit card JSON from the patient summary below.
 
-Summary:
+RULES:
+- symptomsES and assessmentES MUST be in Spanish only
+- symptomsEN and assessmentEN MUST be in English only — translate even if the input is in Spanish
+- questionsES MUST be in Spanish only
+- questionsEN MUST be in English only — translate even if the input is in Spanish
+- clinicianSummary MUST be in English only
+
+Patient summary:
 - Symptoms: {chat_summary.get('symptoms', '')}
 - Assessment: {chat_summary.get('assessment', '')}
 - Urgency: {chat_summary.get('urgency', 'routine')}
 - Questions: {chat_summary.get('questions', [])}
 
-Return ONLY valid JSON:
+Return ONLY valid JSON with no extra text:
 {{
-  "clinicianSummary": "2-sentence medical summary in English",
-  "symptomsES": "Descripcion breve en espanol",
-  "symptomsEN": "Brief description in English",
+  "clinicianSummary": "2-sentence medical summary in English for the doctor",
+  "symptomsES": "Descripcion de sintomas en espanol",
+  "symptomsEN": "Symptom description in English",
   "assessmentES": "Evaluacion en espanol",
   "assessmentEN": "Assessment in English",
-  "questionsES": ["Pregunta 1", "Pregunta 2", "Pregunta 3"],
-  "questionsEN": ["Question 1", "Question 2", "Question 3"]
+  "questionsES": ["Pregunta 1 en espanol", "Pregunta 2", "Pregunta 3"],
+  "questionsEN": ["Question 1 in English", "Question 2", "Question 3"]
 }}"""
 
     response = client.messages.create(model='claude-sonnet-4-6', max_tokens=1024, temperature=0.2, messages=[{'role': 'user', 'content': prompt}])
